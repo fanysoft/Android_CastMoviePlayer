@@ -2,7 +2,7 @@
 Android Demo - technology used
 - Cast
 - ExoPlayer
-- Retrofit Http
+- Retrofit Http - GET list of moview from REST Api, POST number of views
 - MVVM
 
 see screenshots
