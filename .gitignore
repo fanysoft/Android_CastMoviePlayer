@@ -1,0 +1,11 @@
+/app/build/generated/ap_generated_sources/debug/out/
+/app/build/generated/source/buildConfig/debug/
+/app/build/generated/crashlytics/res/debug/
+/app/build/generated/res/google-services/debug/
+/app/build/generated/res/resValues/debug/
+/build/
+/app/build/
+/app/fullFlavor/
+/app/release/
+/.gradle/
+/.idea/
