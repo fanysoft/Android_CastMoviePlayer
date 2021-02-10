@@ -27,9 +27,22 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/textViewCasting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cast info"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/exo_video_view"
+            app:layout_constraintEnd_toEndOf="@+id/exo_video_view"
+            app:layout_constraintStart_toStartOf="@+id/exo_video_view"
+            app:layout_constraintTop_toTopOf="@+id/exo_video_view"
+            android:visibility="gone"/>
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Some other views -->
+    <!-- Moview details -->
     <TextView
         android:id="@+id/textViewPlayerName"
         android:layout_width="match_parent"

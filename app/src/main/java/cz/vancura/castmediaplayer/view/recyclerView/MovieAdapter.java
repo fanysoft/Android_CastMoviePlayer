@@ -20,14 +20,17 @@ import java.util.List;
 import cz.vancura.castmediaplayer.model.MoviePOJO;
 import cz.vancura.castmediaplayer.R;
 
+/*
+RecyclerView Adapter
+ */
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>{
 
     private static String TAG = "myTAG-MovieAdapter";
+
     private List<MoviePOJO> moviePOJOList;
     public static ListItemClickListener mOnClickListener;
     Context context;
-    // for animation
-    private int lastPosition = -1;
+
 
     // 1 - contructor
     public MovieAdapter(List<MoviePOJO> dataClassList, ListItemClickListener onClickListener, Context context) {
@@ -84,9 +87,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     @Override
     public void onBindViewHolder(@NonNull MovieAdapter.MovieViewHolder holder, int position) {
 
-        // animation
-        // setAnimation(holder.itemView, position);
-
 
         MoviePOJO moviePOJO = moviePOJOList.get(position);
 
@@ -116,14 +116,5 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     }
 
 
-    // Animation - from left to right
-    private void setAnimation(View viewToAnimate, int position) {
-        // If the bound view wasn't previously displayed on screen, it's animated
-        if (position > lastPosition){
-            Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
-            viewToAnimate.startAnimation(animation);
-            lastPosition = position;
-        }
-    }
 
 }

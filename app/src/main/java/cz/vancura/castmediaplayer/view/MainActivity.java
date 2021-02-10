@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,6 +33,9 @@ import cz.vancura.castmediaplayer.viewmodel.MainActivityViewModel;
 
 import static cz.vancura.castmediaplayer.viewmodel.MainActivityViewModel.HttpGetData;
 
+/*
+MainActivity - class + view
+ */
 
 public class MainActivity extends AppCompatActivity implements ListItemClickListener {
 
@@ -39,11 +43,16 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
 
     public static Context context;
     public static View MainView;
+
+    // Recycler View
     static RecyclerView mRecyclerView;
     private static MovieAdapter movieAdapter;
 
+    // GUI
     private ImageView imageRecyclerViewStyle, imageRecyclerViewSort;
+    private static ProgressBar progressBar;
 
+    // MVVM
     private static MainActivityViewModel mainActivityViewModel;
 
     boolean RecyclerViewCollumns = true;
@@ -65,23 +74,27 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         // GUI
         imageRecyclerViewStyle = findViewById(R.id.imageViewMainViewStyle);
         imageRecyclerViewSort = findViewById(R.id.imageViewMainViewSort);
+        progressBar = findViewById(R.id.progressBar);
 
         // ToolBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Recycler View init
+        mRecyclerView = findViewById(R.id.recycler_view);
         SetupRecyclerView(RecyclerViewCollumns);
+
+        // GUI - loading ..
+        ShowLoading();
+
 
         // is online ?
         if(HelperMethods.IsOnline(context)){
             // online
             HttpGetData();
-
         }else{
             // offline
-            HelperMethods.ShowSnackbar(this, MainView, "You are offline");
-
+            ShowError("Offline - to be online is better...");
         }
 
         // Images - onClick - user selection : sort RecyclerView
@@ -90,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
             public void onClick(View view) {
                 Log.d(TAG, "clicked - RecylerView Sort icon");
 
-                // sort by - hardcoded for text - make user selection in dialog - to do idea
+                // sort by - hardcoded - make user selection in dialog - to do idea
                 String SortBy = "id";
 
                 switch(SortBy) {
@@ -176,27 +189,59 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
    }
 
 
+    // GUI - loading
+    private void ShowLoading(){
+
+        Log.d(TAG, "ShowLoading");
+
+        // show ProgressBar
+        progressBar.setVisibility(View.VISIBLE);
+        // hide RecyclerView
+        mRecyclerView.setVisibility(View.GONE);
+
+    }
+
+    // GUI - loading done
+    public static void ShowRecyclerView(){
+
+        Log.d(TAG, "ShowRecyclerView");
+
+        // hide ProgressBar
+        progressBar.setVisibility(View.GONE);
+        // show RecyclerView
+        mRecyclerView.setVisibility(View.VISIBLE);
+
+    }
+
+    // GUI - error
+    public static void ShowError(String error){
+
+        Log.d(TAG, "ShowError");
+
+        // SnackBar
+        HelperMethods.ShowSnackbar(MainActivity.context, MainView, error);
+
+        // ProgressBar hide
+        progressBar.setVisibility(View.GONE);
+    }
+
+
 
     // create RecyclerView
     private void SetupRecyclerView(Boolean showCollumns) {
-
-        Log.d(TAG, "SetupRecyclerView");
-
-        // RecyclerView
-        mRecyclerView = findViewById(R.id.recycler_view);
 
         if (showCollumns) {
             Log.d(TAG, "SetupRecyclerView - with columns");
             // 2 colllumns for portait, 3 for landscape
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+                mRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
             } else {
-                mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+                mRecyclerView.setLayoutManager(new GridLayoutManager(context, 3));
             }
         }else{
             // no columns, rows below each other
             Log.d(TAG, "SetupRecyclerView - without columns");
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
             mRecyclerView.setLayoutManager(mLayoutManager);
         }
 
@@ -207,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(movieAdapter);
 
-
     }
 
 
@@ -215,7 +259,6 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     public static void RefreshRecyclerView(){
         Log.d(TAG, "RefreshRecyclerView");
         movieAdapter.notifyDataSetChanged();
-
     }
 
 

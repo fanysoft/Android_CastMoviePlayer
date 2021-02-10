@@ -14,6 +14,10 @@ import retrofit2.Response;
 
 import static cz.vancura.castmediaplayer.view.exoplayer.PlayerActivity.PlayerView;
 
+/*
+MVVM ViewModel for PlayerActitivy - bussiness logic here is Http Work
+ */
+
 public class PlayerActivityViewModel extends ViewModel {
 
     private static String TAG = "myTAG-PlayerActivityViewModel";

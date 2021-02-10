@@ -11,8 +11,8 @@ import java.util.List;
 import cz.vancura.castmediaplayer.R;
 
 /*
-
 Cast class - registered in Manifest
+source : google docs
  */
 
 public class CastOptionsProvider implements OptionsProvider {

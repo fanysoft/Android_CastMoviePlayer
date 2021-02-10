@@ -38,7 +38,19 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewMainViewStyle" />
+        app:layout_constraintTop_toBottomOf="@+id/imageViewMainViewStyle"
+        android:visibility="gone"/>
+
+    <!-- Progress Bar Loading -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

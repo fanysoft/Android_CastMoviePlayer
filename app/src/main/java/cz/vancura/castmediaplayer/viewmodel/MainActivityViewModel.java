@@ -19,6 +19,9 @@ import retrofit2.Response;
 
 import static cz.vancura.castmediaplayer.view.MainActivity.MainView;
 
+/*
+MVVM ViewModel for MainActitivy - bussiness logic here is Http Work
+ */
 public class MainActivityViewModel extends ViewModel {
 
     private static String TAG = "myTAG-MainActivityViewModel";
@@ -35,6 +38,7 @@ public class MainActivityViewModel extends ViewModel {
 
         // Retrofit interface
         RetrofitAPIInterface apiInterface = RetrofitAPIClient.getClient(false).create(RetrofitAPIInterface.class);
+
         // Retrofit HTTP call
         Call<List<RetrofitPOJO>> call = apiInterface.getMovies();
         call.enqueue(new Callback<List<RetrofitPOJO>>() {
@@ -51,7 +55,7 @@ public class MainActivityViewModel extends ViewModel {
 
                         for (RetrofitPOJO retrofitPOJO : response.body()) {
                             String data = retrofitPOJO.name + " " + retrofitPOJO.urlMovie + "\n";
-                            Log.d(TAG,"response data loop =" +  data);
+                            Log.d(TAG,"response data loop - " +  data);
 
                             // create POJO
                             MoviePOJO moviePOJO = new MoviePOJO(retrofitPOJO.id, retrofitPOJO.name, retrofitPOJO.urlMovie, retrofitPOJO.urlIcon, retrofitPOJO.descr, retrofitPOJO.source, retrofitPOJO.duration, retrofitPOJO.views);
@@ -60,21 +64,24 @@ public class MainActivityViewModel extends ViewModel {
 
                         }
 
+                        // Show RecyclerView
+                        MainActivity.ShowRecyclerView();
+
                         // refresh RecyclerView
                         MainActivity.RefreshRecyclerView();
 
                     }catch (Exception e){
                         String error = "Server ERROR " +  e.getLocalizedMessage();
                         Log.e(TAG,error);
-                        HelperMethods.ShowSnackbar(MainActivity.context, MainView, error);
+                        MainActivity.ShowError(error);
                     }
 
                 }else{
                     //ng
-                    Log.e(TAG, "Server response is not ok " + response.code());
-                    HelperMethods.ShowSnackbar(MainActivity.context, MainView, "Server response is not OK");
+                    String error = "Server response is not ok " + response.code();
+                    Log.e(TAG, error);
+                    MainActivity.ShowError(error);
                 }
-
 
             }
 
@@ -82,14 +89,11 @@ public class MainActivityViewModel extends ViewModel {
             public void onFailure(Call<List<RetrofitPOJO>> call, Throwable t) {
                 String error = "Server ERROR " +  t.getLocalizedMessage();
                 Log.e(TAG, "onFailure " + error);
-                HelperMethods.ShowSnackbar(MainActivity.context, MainView, error);
+                MainActivity.ShowError(error);
                 call.cancel();
             }
         });
 
-
-        // refresh RecyclerView
-        MainActivity.RefreshRecyclerView();
 
     }
 

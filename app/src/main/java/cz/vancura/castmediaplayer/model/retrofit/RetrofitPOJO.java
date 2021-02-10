@@ -3,6 +3,10 @@ package cz.vancura.castmediaplayer.model.retrofit;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/*
+Retrofit POJO based on Server response structure
+ */
+
 public class RetrofitPOJO {
 
     @SerializedName("id")

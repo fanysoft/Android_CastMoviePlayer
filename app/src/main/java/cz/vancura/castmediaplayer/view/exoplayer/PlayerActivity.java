@@ -37,6 +37,13 @@ import cz.vancura.castmediaplayer.helpers.HelperMethods;
 import cz.vancura.castmediaplayer.viewmodel.MainActivityViewModel;
 import cz.vancura.castmediaplayer.viewmodel.PlayerActivityViewModel;
 
+/*
+Player Activity - class - view, hosting ExoPlayer with Cast functions
+
+
+ to do next ideas - add listener for REMOTE cast device - to act according - example when user seeks at Cast, end Cast, resume local player at Cast positon ..
+ */
+
 public class PlayerActivity extends AppCompatActivity {
 
     private static String TAG = "myTAG-PlayerActivity";
@@ -46,6 +53,7 @@ public class PlayerActivity extends AppCompatActivity {
     public static Context context;
     public static View PlayerView;
     TextView textViewName, textViewDescr, textViewLicence, textViewViews;
+    static TextView textViewCasting;
     private static int positon;
 
     // ExoPlayer
@@ -64,6 +72,7 @@ public class PlayerActivity extends AppCompatActivity {
     private MenuItem mediaRouteMenuItem;
     private static CastSession mCastSession;
     private SessionManagerListener<CastSession> mSessionManagerListener;
+    static boolean wasCastingBefore = false;
 
 
     @Override
@@ -86,15 +95,12 @@ public class PlayerActivity extends AppCompatActivity {
         textViewDescr = findViewById(R.id.textViewPlayerDescr);
         textViewLicence = findViewById(R.id.textViewPlayerLicence);
         textViewViews = findViewById(R.id.textViewPlayerViews);
+        textViewCasting = findViewById(R.id.textViewCasting);
 
         // receive data sent from MainActivity
         Intent intent = getIntent();
         positon = intent.getIntExtra("myPosition",0);
         Log.d(TAG, "Recived data from MainActivity - positon=" + positon);
-
-
-        // TODO media - pridat 2 svoje videa dron
-        
 
         // moview info
         int movieId = MainActivityViewModel.moviePOJOList.get(positon).getMovieId();
@@ -155,6 +161,7 @@ public class PlayerActivity extends AppCompatActivity {
 
                 // there was found Cast device
                 if (newState != CastState.NO_DEVICES_AVAILABLE) {
+                    // show cast info - only when app started for 1st time
                     showIntroductoryOverlay();
                 }
             }
@@ -178,10 +185,10 @@ public class PlayerActivity extends AppCompatActivity {
 
     // ExoPlayer init
     private static void ExoPlayerInitialize(){
-        Log.d(TAG, "ExoPlayerInitialize()");
+        Log.d(TAG, "ExoPlayerInitialize() - playWhenReady=" + playWhenReady);
 
+        // Media info
         Uri uri = Uri.parse(videoUrl);
-
         MediaSource mediaSource = buildMediaSource(uri);
 
         player.setPlayWhenReady(playWhenReady);
@@ -229,7 +236,8 @@ public class PlayerActivity extends AppCompatActivity {
 
     //********** Cast methods *******
 
-    // Cast - Cast Button
+    // Cast - Cast intro - will show only at 1st runn
+    // A simple overlay view that highlights the Cast button to the user
     private void showIntroductoryOverlay() {
         Log.d(TAG, "showIntroductoryOverlay");
 
@@ -287,6 +295,7 @@ public class PlayerActivity extends AppCompatActivity {
             public void onSessionStarted(CastSession session, String sessionId) {
                 onApplicationConnected(session);
                 Log.d(TAG, "SessionManagerListener - onSessionStarted");
+                // now cast is playing video, local player paused
             }
 
             @Override
@@ -298,6 +307,7 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void onSessionStarting(CastSession session) {
                 Log.d(TAG, "SessionManagerListener - onSessionStarting");
+                ShowCastInfo("Connecting to remote Cast device ..");
             }
 
             @Override
@@ -317,30 +327,39 @@ public class PlayerActivity extends AppCompatActivity {
 
             private void onApplicationConnected(CastSession castSession) {
                 Log.d(TAG, "SessionManagerListener - onApplicationConnected... ");
+                //cast device was just connected - ready to rock and roll - stop local player and handle to Cast
 
                 mCastSession = castSession;
+
+                // stop local player
+                ExoPlayerStop();
+
+                // hide player controls
+                exoPlayerView.setUseController(false);
 
                 // Start Casting - auto play on
                 StartCast(true);
 
-                // cast device was just connected - we can stop local player
-                ExoPlayerStop();
+                // show info playing at remote screen
+                ShowCastInfo("Playing at remote Cast device");
 
-                // Show SnackBar
-                HelperMethods.ShowSnackbar(PlayerActivity.context, PlayerView, "Casting started");
+                wasCastingBefore = true;
 
                 invalidateOptionsMenu();
             }
 
             private void onApplicationDisconnected() {
-
                 Log.d(TAG, "SessionManagerListener - onApplicationDisconnected... ");
+                // cast device was dissconnected - getting back to localplayer
 
-                // cast device was dissconnected - we can resume local player or show info to user
+                // local player play
                 ExoPlayerPlay();
 
-                // Show SnackBar
-                HelperMethods.ShowSnackbar(PlayerActivity.context, PlayerView, "Casting stopped");
+                // show player controls
+                exoPlayerView.setUseController(true);
+
+                // hide info playing at remote screen
+                HideCastInfo();
 
                 invalidateOptionsMenu();
             }
@@ -349,11 +368,13 @@ public class PlayerActivity extends AppCompatActivity {
 
     // Cast - start remote play - called when player started playback from PlaybackStateListener
     public static void StartCast(Boolean autoPlay){
-        Log.d(TAG, "StartCast");
+        Log.d(TAG, "StartCast - autoPlay=" + autoPlay);
+
+        int position = (int) player.getCurrentPosition();
 
         if (mCastSession != null && mCastSession.isConnected()) {
-            Log.d(TAG, "StartCast - Cast session is connected - we can play on REMOTE");
-            loadRemoteMedia(0, autoPlay);
+            Log.d(TAG, "StartCast - Cast session is connected - lets play on REMOTE - start from playHead " + position);
+            loadRemoteMedia(position, autoPlay);
         } else {
             Log.d(TAG, "StartCast - Cast session is NOT connected - we have to play on LOCAL");
         }
@@ -374,17 +395,17 @@ public class PlayerActivity extends AppCompatActivity {
     private static void loadRemoteMedia(int position, boolean autoPlay) {
         Log.d(TAG, "loadRemoteMedia");
 
-        if (mCastSession == null) {
-            return;
-        }
         RemoteMediaClient remoteMediaClient = mCastSession.getRemoteMediaClient();
+
         if (remoteMediaClient == null) {
+            Log.e(TAG, "remoteMediaClient is null - can not cast");
             return;
         }
         remoteMediaClient.load(new MediaLoadRequestData.Builder()
                 .setMediaInfo(buildMediaInfo()) // see method buildMediaInfo()
                 .setAutoplay(autoPlay)
-                .setCurrentTime(position).build());
+                .setCurrentTime(position)
+                .build());
     }
 
     // Cast - buildMediaInfo - pass movie data to Cast
@@ -414,7 +435,33 @@ public class PlayerActivity extends AppCompatActivity {
 
 
 
-    // Lifecycle
+
+    // GUI - show info about Cast status
+    private static void ShowCastInfo(String text){
+
+        // Show SnackBar
+        // HelperMethods.ShowSnackbar(PlayerActivity.context, PlayerView, "Casting started");
+
+        textViewCasting.setVisibility(View.VISIBLE);
+        textViewCasting.setText(text);
+
+    }
+
+    // GUI - hide info about Cast status
+    private static void HideCastInfo(){
+
+        // Show SnackBar
+        if (wasCastingBefore){
+            //HelperMethods.ShowSnackbar(PlayerActivity.context, PlayerView, "Casting stopped");
+        }
+
+        textViewCasting.setVisibility(View.GONE);
+
+    }
+
+
+
+    // Lifecycle - register/unregister listeners, Exoplayer init/release
 
 
     @Override

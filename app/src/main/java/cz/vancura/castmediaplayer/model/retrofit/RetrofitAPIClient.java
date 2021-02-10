@@ -9,6 +9,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
+/*
+Retrofit API client - encapsulation
+ */
+
 public class RetrofitAPIClient {
 
     public static Retrofit retrofit = null;
@@ -45,11 +49,5 @@ public class RetrofitAPIClient {
 
         return retrofit;
     }
-
-
-
-
-
-
 
 }

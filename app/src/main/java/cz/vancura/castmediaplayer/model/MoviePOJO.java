@@ -2,6 +2,9 @@ package cz.vancura.castmediaplayer.model;
 
 import android.util.Log;
 
+/*
+Main POJO object class hosting Movies objects
+ */
 public class MoviePOJO {
 
     private static String TAG = "myTAG-MoviePOJO";

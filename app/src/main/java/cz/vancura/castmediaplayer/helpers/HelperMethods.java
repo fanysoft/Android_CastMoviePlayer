@@ -12,6 +12,10 @@ import com.google.android.material.snackbar.Snackbar;
 
 import cz.vancura.castmediaplayer.R;
 
+/*
+Various Java classes used in whole app
+ */
+
 public class HelperMethods {
 
     private static String TAG = "myTAG-HelperMethods";

@@ -1,8 +1,9 @@
 <resources>
+
     <string name="app_name">CastMediaPlayer</string>
 
-    <!-- TODO replace with my custom Reciever -->
-    <string name="cast_app_id">4F8B3483</string>
+    <!-- my custom Reciever - Googles 4F8B3483 -->
+    <string name="cast_app_id">97F739D5</string>
 
     <string name="media_route_menu_title">Play on&#8230;</string>
 
