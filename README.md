@@ -3,6 +3,7 @@ Android Demo - technology used
 - Cast - using own Styled Media Reciever
 - ExoPlayer
 - Retrofit Http - GET list of moview from REST Api, POST number of views
+- Recycler view - nr of collumns set according device orientation, configurable by user
 - MVVM
 
 see screenshots
