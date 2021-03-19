@@ -1,6 +1,8 @@
 package cz.vancura.castmediaplayer.view.exoplayer;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
@@ -50,13 +52,16 @@ public class PlayerActivity extends AppCompatActivity {
 
     // ViewModel
     private static PlayerActivityViewModel playerActivityViewModel;
-    public static Context context;
-    public static View PlayerView;
+
+    // GUI
+    public Context context;
+    public View PlayerView;
     TextView textViewName, textViewDescr, textViewLicence, textViewViews;
-    static TextView textViewCasting;
+    TextView textViewCasting;
     private static int positon;
 
     // ExoPlayer
+    // TODO remove static - memory leak
     private static com.google.android.exoplayer2.ui.PlayerView exoPlayerView;
     private static SimpleExoPlayer player;
     private static PlaybackStateListener playbackStateListener;
@@ -90,6 +95,20 @@ public class PlayerActivity extends AppCompatActivity {
         // ViewModel
         playerActivityViewModel = new ViewModelProvider(this).get(PlayerActivityViewModel.class);
 
+        // LiveData Observer - for Error
+        final Observer<String> errorObserver = new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable final String error) {
+                // Update the UI
+                Log.d(TAG, "error observer - update GUI now");
+                // TODO ShowError(error);
+                //HelperMethods.ShowSnackbar(PlayerActivity.context, PlayerView, error);
+
+            }
+        };
+        playerActivityViewModel.getErrorLiveData().observe(this, errorObserver);
+
+
         // GUI
         textViewName = findViewById(R.id.textViewPlayerName);
         textViewDescr = findViewById(R.id.textViewPlayerDescr);
@@ -121,7 +140,7 @@ public class PlayerActivity extends AppCompatActivity {
 
         // count of views +1 at server side
         Log.d(TAG, "views +1 - calling Retrofit in ViewModel ...");
-        PlayerActivityViewModel.HttpPostViews(movieId);
+        playerActivityViewModel.HttpPostViews(movieId);
 
         // create video player
         videoUrl = movieUrl;
@@ -174,7 +193,7 @@ public class PlayerActivity extends AppCompatActivity {
     //********** ExoPlayer methods *******
 
     // ExoPlayer create
-    private static void ExoPlayerCreate(){
+    private void ExoPlayerCreate(){
         Log.d(TAG, "ExoPlayerCreate()");
 
         // create player
@@ -184,7 +203,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     // ExoPlayer init
-    private static void ExoPlayerInitialize(){
+    private void ExoPlayerInitialize(){
         Log.d(TAG, "ExoPlayerInitialize() - playWhenReady=" + playWhenReady);
 
         // Media info
@@ -201,7 +220,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     // ExoPlayer MediaSource
-    private static MediaSource buildMediaSource(Uri uri) {
+    private MediaSource buildMediaSource(Uri uri) {
 
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, "exoplayer-codelab");
         return new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
@@ -437,7 +456,7 @@ public class PlayerActivity extends AppCompatActivity {
 
 
     // GUI - show info about Cast status
-    private static void ShowCastInfo(String text){
+    private void ShowCastInfo(String text){
 
         // Show SnackBar
         // HelperMethods.ShowSnackbar(PlayerActivity.context, PlayerView, "Casting started");
@@ -448,7 +467,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     // GUI - hide info about Cast status
-    private static void HideCastInfo(){
+    private void HideCastInfo(){
 
         // Show SnackBar
         if (wasCastingBefore){

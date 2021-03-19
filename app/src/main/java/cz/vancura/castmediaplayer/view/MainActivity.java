@@ -44,17 +44,16 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
 
     private static String TAG = "myTAG-MainActivity";
 
-    // TODO remove static - memory leak
-    public static Context context;
-    public static View MainView;
+    public Context context;
+    public View MainView;
 
     // Recycler View
     static RecyclerView mRecyclerView;
-    private static MovieAdapter movieAdapter;
+    private MovieAdapter movieAdapter;
 
     // GUI
     private ImageView imageRecyclerViewStyle, imageRecyclerViewSort;
-    private static ProgressBar progressBar;
+    private ProgressBar progressBar;
 
     // MVVM
     private static MainActivityViewModel mainActivityViewModel;
@@ -114,17 +113,20 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         mRecyclerView = findViewById(R.id.recycler_view);
         SetupRecyclerView(RecyclerViewCollumns);
 
-        // GUI - loading ..
-        ShowLoading();
-
 
         // is online ?
         if(HelperMethods.IsOnline(context)){
+
+            // GUI - loading ..
+            ShowLoading();
+
             // online
             mainActivityViewModel.HttpGetData();
         }else{
-            // offline
+
+            // GUI - offline
             ShowError("Offline - to be online is better...");
+
         }
 
         // Images - onClick - user selection : sort RecyclerView
@@ -232,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     }
 
     // GUI - loading done
-    private static void ShowRecyclerView(){
+    private void ShowRecyclerView(){
 
         Log.d(TAG, "ShowRecyclerView");
 
@@ -247,12 +249,12 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     }
 
     // GUI - error
-    private static void ShowError(String error){
+    private void ShowError(String error){
 
         Log.d(TAG, "ShowError");
 
         // SnackBar
-        HelperMethods.ShowSnackbar(MainActivity.context, MainView, error);
+        HelperMethods.ShowSnackbar(context, MainView, error);
 
         // ProgressBar hide
         progressBar.setVisibility(View.GONE);

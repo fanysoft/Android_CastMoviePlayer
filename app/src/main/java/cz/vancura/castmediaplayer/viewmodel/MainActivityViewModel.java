@@ -18,7 +18,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static cz.vancura.castmediaplayer.view.MainActivity.MainView;
+
 
 /*
 MVVM ViewModel for MainActitivy - bussiness logic here is Http Work
@@ -113,8 +113,11 @@ public class MainActivityViewModel extends ViewModel {
             public void onFailure(Call<List<RetrofitPOJO>> call, Throwable t) {
                 String error = "Server ERROR " +  t.getLocalizedMessage();
                 Log.e(TAG, "onFailure " + error);
-                // TODO replace by LiveData
-                //MainActivity.ShowError(error);
+
+                // LiveData set - will triger GUI change in View
+                errorLiveData.setValue(error);
+
+                // Retrofit call cancel
                 call.cancel();
             }
         });

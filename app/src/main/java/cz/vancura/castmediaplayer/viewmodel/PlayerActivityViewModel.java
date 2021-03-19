@@ -2,6 +2,7 @@ package cz.vancura.castmediaplayer.viewmodel;
 
 import android.util.Log;
 
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import cz.vancura.castmediaplayer.helpers.HelperMethods;
@@ -12,7 +13,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static cz.vancura.castmediaplayer.view.exoplayer.PlayerActivity.PlayerView;
+
 
 /*
 MVVM ViewModel for PlayerActitivy - bussiness logic here is Http Work
@@ -22,8 +23,18 @@ public class PlayerActivityViewModel extends ViewModel {
 
     private static String TAG = "myTAG-PlayerActivityViewModel";
 
+    // LiveData Error
+    private MutableLiveData<String> errorLiveData;
+
+    public MutableLiveData<String> getErrorLiveData() {
+        if (errorLiveData == null) {
+            errorLiveData = new MutableLiveData<String>();
+        }
+        return errorLiveData;
+    }
+
     // Http job - will touch REST API with movie id, PHP will increase views count +1
-    public static void HttpPostViews(int movieId){
+    public void HttpPostViews(int movieId){
         Log.d(TAG, "HttpPostViews - movieId=" + movieId);
 
 
@@ -49,13 +60,19 @@ public class PlayerActivityViewModel extends ViewModel {
                     }catch (Exception e){
                         String error = "Server ERROR " +  e.getLocalizedMessage();
                         Log.e(TAG,error);
-                        HelperMethods.ShowSnackbar(PlayerActivity.context, PlayerView, error);
+
+                        // LiveData change - will trigger View update
+                        errorLiveData.setValue(error);
+
                     }
 
                 }else{
                     //ng
                     Log.e(TAG, "Server response is not ok " + response.code());
-                    HelperMethods.ShowSnackbar(PlayerActivity.context, PlayerView, "Server response is not OK");
+
+                    // LiveData change - will trigger View update
+                    errorLiveData.setValue("Server response is not OK");
+
                 }
 
             }
@@ -64,7 +81,11 @@ public class PlayerActivityViewModel extends ViewModel {
             public void onFailure(Call<String> call, Throwable t) {
                 String error = "Server ERROR " +  t.getLocalizedMessage();
                 Log.e(TAG, "onFailure " + error);
-                HelperMethods.ShowSnackbar(PlayerActivity.context, PlayerView, error);
+
+                // LiveData change - will trigger View update
+                errorLiveData.setValue(error);
+
+                // cancel Retrofit call
                 call.cancel();
             }
         });
