@@ -35,6 +35,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     // 1 - contructor
     public MovieAdapter(List<MoviePOJO> dataClassList, ListItemClickListener onClickListener, Context context) {
         this.moviePOJOList = dataClassList;
+        // TODO leak fix
         this.mOnClickListener = onClickListener;
         this.context = context;
     }
@@ -86,7 +87,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     // 4 - Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(@NonNull MovieAdapter.MovieViewHolder holder, int position) {
-
 
         MoviePOJO moviePOJO = moviePOJOList.get(position);
 

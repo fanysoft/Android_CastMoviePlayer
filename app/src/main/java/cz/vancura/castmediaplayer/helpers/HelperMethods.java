@@ -14,6 +14,7 @@ import cz.vancura.castmediaplayer.R;
 
 /*
 Various Java classes used in whole app
+could be Singleton
  */
 
 public class HelperMethods {
@@ -21,7 +22,7 @@ public class HelperMethods {
     private static String TAG = "myTAG-HelperMethods";
 
     // Is online - check network connection
-    public static boolean IsOnline(Context context){
+    public boolean IsOnline(Context context){
 
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -34,11 +35,11 @@ public class HelperMethods {
     }
 
     // GUI - show SnackBar
-    public static void ShowSnackbar(Context context, View view, String text){
+    public void ShowSnackbar(Context context, View view, String text){
 
         final Snackbar mySnackbar = Snackbar.make(view, text, Snackbar.LENGTH_INDEFINITE);
         mySnackbar
-                .setActionTextColor(R.color.accent)
+                .setActionTextColor(context.getResources().getColor(R.color.accent))
                 .setAction("Dismiss", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

@@ -35,8 +35,8 @@ public class PlayerActivityViewModel extends ViewModel {
 
     // Http job - will touch REST API with movie id, PHP will increase views count +1
     public void HttpPostViews(int movieId){
-        Log.d(TAG, "HttpPostViews - movieId=" + movieId);
 
+        Log.d(TAG, "HttpPostViews - movieId=" + movieId);
 
         // Retrofit interface
         RetrofitAPIInterface apiInterface = RetrofitAPIClient.getClient(true).create(RetrofitAPIInterface.class);

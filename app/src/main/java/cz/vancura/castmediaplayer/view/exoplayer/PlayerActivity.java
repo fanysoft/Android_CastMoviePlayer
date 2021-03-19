@@ -61,8 +61,7 @@ public class PlayerActivity extends AppCompatActivity {
     private static int positon;
 
     // ExoPlayer
-    // TODO remove static - memory leak
-    private static com.google.android.exoplayer2.ui.PlayerView exoPlayerView;
+    private com.google.android.exoplayer2.ui.PlayerView exoPlayerView;
     private static SimpleExoPlayer player;
     private static PlaybackStateListener playbackStateListener;
     private static boolean playWhenReady = false;
@@ -75,10 +74,11 @@ public class PlayerActivity extends AppCompatActivity {
     private CastStateListener mCastStateListener;
     private IntroductoryOverlay mIntroductoryOverlay;
     private MenuItem mediaRouteMenuItem;
-    private static CastSession mCastSession;
+    private CastSession mCastSession;
     private SessionManagerListener<CastSession> mSessionManagerListener;
     static boolean wasCastingBefore = false;
 
+    HelperMethods helperMethods;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,13 +101,14 @@ public class PlayerActivity extends AppCompatActivity {
             public void onChanged(@Nullable final String error) {
                 // Update the UI
                 Log.d(TAG, "error observer - update GUI now");
-                // TODO ShowError(error);
-                //HelperMethods.ShowSnackbar(PlayerActivity.context, PlayerView, error);
-
+                helperMethods.ShowSnackbar(context, PlayerView, error);
             }
         };
         playerActivityViewModel.getErrorLiveData().observe(this, errorObserver);
 
+
+        // helper class
+        helperMethods = new HelperMethods();
 
         // GUI
         textViewName = findViewById(R.id.textViewPlayerName);
@@ -119,7 +120,8 @@ public class PlayerActivity extends AppCompatActivity {
         // receive data sent from MainActivity
         Intent intent = getIntent();
         positon = intent.getIntExtra("myPosition",0);
-        Log.d(TAG, "Recived data from MainActivity - positon=" + positon);
+        Log.d(TAG, "Received data from MainActivity - positon=" + positon);
+
 
         // moview info
         int movieId = MainActivityViewModel.moviePOJOList.get(positon).getMovieId();
@@ -386,7 +388,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     // Cast - start remote play - called when player started playback from PlaybackStateListener
-    public static void StartCast(Boolean autoPlay){
+    public void StartCast(Boolean autoPlay){
         Log.d(TAG, "StartCast - autoPlay=" + autoPlay);
 
         int position = (int) player.getCurrentPosition();
@@ -411,7 +413,7 @@ public class PlayerActivity extends AppCompatActivity {
 
 
     // Cast - loadRemoteMedia
-    private static void loadRemoteMedia(int position, boolean autoPlay) {
+    private void loadRemoteMedia(int position, boolean autoPlay) {
         Log.d(TAG, "loadRemoteMedia");
 
         RemoteMediaClient remoteMediaClient = mCastSession.getRemoteMediaClient();

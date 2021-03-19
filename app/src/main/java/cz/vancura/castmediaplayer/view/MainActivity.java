@@ -55,11 +55,13 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     private ImageView imageRecyclerViewStyle, imageRecyclerViewSort;
     private ProgressBar progressBar;
 
-    // MVVM
+    // MVVM ViewModel
     private static MainActivityViewModel mainActivityViewModel;
 
     boolean RecyclerViewCollumns = true;
     boolean SortByIdLowToHigh = true;
+
+    HelperMethods helperMethods;
 
 
     @Override
@@ -99,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         mainActivityViewModel.getMoviePOJOListLiveData().observe(this, dataObserver);
 
 
-
         // GUI
         imageRecyclerViewStyle = findViewById(R.id.imageViewMainViewStyle);
         imageRecyclerViewSort = findViewById(R.id.imageViewMainViewSort);
@@ -109,13 +110,16 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // helper class
+        helperMethods = new HelperMethods();
+
         // Recycler View init
         mRecyclerView = findViewById(R.id.recycler_view);
         SetupRecyclerView(RecyclerViewCollumns);
 
 
         // is online ?
-        if(HelperMethods.IsOnline(context)){
+        if(helperMethods.IsOnline(context)){
 
             // GUI - loading ..
             ShowLoading();
@@ -254,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         Log.d(TAG, "ShowError");
 
         // SnackBar
-        HelperMethods.ShowSnackbar(context, MainView, error);
+        helperMethods.ShowSnackbar(context, MainView, error);
 
         // ProgressBar hide
         progressBar.setVisibility(View.GONE);
@@ -319,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     }
 
 
-    // RecyclerView onCLick callback - play it
+    // RecyclerView onCLick callback - play selected video
     @Override
     public void onListItemClick(int position) {
         Log.d(TAG, "onListItemClick " + position);
@@ -338,11 +342,11 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     public void onLongClick(int position) {
         Log.d(TAG, "onLongClick " + position);
         // delete from list
-        mainActivityViewModel.moviePOJOList.remove(position);
+        MainActivityViewModel.moviePOJOList.remove(position);
         // refresh RecyclerView
         movieAdapter.notifyDataSetChanged();
         // user info
-        HelperMethods.ShowSnackbar(this, MainView, "Movie deleted - Refresh to undo");
+        helperMethods.ShowSnackbar(this, MainView, "Movie deleted - Refresh to undo");
     }
 
 }
