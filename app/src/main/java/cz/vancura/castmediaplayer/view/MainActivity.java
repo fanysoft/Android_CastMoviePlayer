@@ -12,8 +12,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -22,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import cz.vancura.castmediaplayer.helpers.HelperMethods;
 import cz.vancura.castmediaplayer.model.MoviePOJO;
@@ -31,7 +34,7 @@ import cz.vancura.castmediaplayer.view.recyclerView.ListItemClickListener;
 import cz.vancura.castmediaplayer.view.recyclerView.MovieAdapter;
 import cz.vancura.castmediaplayer.viewmodel.MainActivityViewModel;
 
-import static cz.vancura.castmediaplayer.viewmodel.MainActivityViewModel.HttpGetData;
+
 
 /*
 MainActivity - class + view
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
 
     private static String TAG = "myTAG-MainActivity";
 
+    // TODO remove static - memory leak
     public static Context context;
     public static View MainView;
 
@@ -71,6 +75,32 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         // ViewModel
         mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
+        // LiveData Observer - for Error
+        final Observer<String> errorObserver = new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable final String error) {
+                // Update the UI
+                Log.d(TAG, "error observer - update GUI now");
+                ShowError(error);
+            }
+        };
+        mainActivityViewModel.getErrorLiveData().observe(this, errorObserver);
+
+
+        // LiveData Observer - for List of MoviePOJO
+        final Observer<List<MoviePOJO>> dataObserver = new Observer<List<MoviePOJO>>() {
+            @Override
+            public void onChanged(List<MoviePOJO> list) {
+                // Update the UI
+                Log.d(TAG, "data observer - update GUI now");
+                ShowRecyclerView();
+
+            }
+        };
+        mainActivityViewModel.getMoviePOJOListLiveData().observe(this, dataObserver);
+
+
+
         // GUI
         imageRecyclerViewStyle = findViewById(R.id.imageViewMainViewStyle);
         imageRecyclerViewSort = findViewById(R.id.imageViewMainViewSort);
@@ -91,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         // is online ?
         if(HelperMethods.IsOnline(context)){
             // online
-            HttpGetData();
+            mainActivityViewModel.HttpGetData();
         }else{
             // offline
             ShowError("Offline - to be online is better...");
@@ -155,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
                 }
 
 
-                RefreshRecyclerView();
+                ShowRecyclerView();
 
             }
         });
@@ -202,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     }
 
     // GUI - loading done
-    public static void ShowRecyclerView(){
+    private static void ShowRecyclerView(){
 
         Log.d(TAG, "ShowRecyclerView");
 
@@ -211,10 +241,13 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         // show RecyclerView
         mRecyclerView.setVisibility(View.VISIBLE);
 
+        // refresh
+        movieAdapter.notifyDataSetChanged();
+
     }
 
     // GUI - error
-    public static void ShowError(String error){
+    private static void ShowError(String error){
 
         Log.d(TAG, "ShowError");
 
@@ -255,11 +288,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     }
 
 
-    // refresh RecyclerView
-    public static void RefreshRecyclerView(){
-        Log.d(TAG, "RefreshRecyclerView");
-        movieAdapter.notifyDataSetChanged();
-    }
+
 
 
     // Menu - create
@@ -278,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 Log.d(TAG, "Refresh from menu");
-                HttpGetData();
+                mainActivityViewModel.HttpGetData();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

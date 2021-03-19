@@ -2,6 +2,7 @@ package cz.vancura.castmediaplayer.viewmodel;
 
 import android.util.Log;
 
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
@@ -28,9 +29,30 @@ public class MainActivityViewModel extends ViewModel {
 
     public static List<MoviePOJO> moviePOJOList = new ArrayList<>();
 
+    // LiveData List
+    private static MutableLiveData<List<MoviePOJO>> moviePOJOListLiveData; // List
+
+    public MutableLiveData<List<MoviePOJO>> getMoviePOJOListLiveData() {
+        if (moviePOJOListLiveData == null) {
+            moviePOJOListLiveData = new MutableLiveData<List<MoviePOJO>>();
+        }
+        return moviePOJOListLiveData;
+    }
+
+
+    // LiveData Error
+    private MutableLiveData<String> errorLiveData;
+
+    public MutableLiveData<String> getErrorLiveData() {
+        if (errorLiveData == null) {
+            errorLiveData = new MutableLiveData<String>();
+        }
+        return errorLiveData;
+    }
+
 
     // download list of movies from REST Api
-    public static void HttpGetData() {
+    public void HttpGetData() {
         Log.d(TAG, "HttpGetData");
 
         // empty list
@@ -64,23 +86,25 @@ public class MainActivityViewModel extends ViewModel {
 
                         }
 
-                        // Show RecyclerView
-                        MainActivity.ShowRecyclerView();
-
-                        // refresh RecyclerView
-                        MainActivity.RefreshRecyclerView();
+                        // LiveData set - will triger GUI change in View
+                        moviePOJOListLiveData.setValue(moviePOJOList);
 
                     }catch (Exception e){
                         String error = "Server ERROR " +  e.getLocalizedMessage();
                         Log.e(TAG,error);
-                        MainActivity.ShowError(error);
+
+                        // LiveData set - will triger GUI change in View
+                        errorLiveData.setValue(error);
+
                     }
 
                 }else{
                     //ng
                     String error = "Server response is not ok " + response.code();
                     Log.e(TAG, error);
-                    MainActivity.ShowError(error);
+
+                    // LiveData set - will triger GUI change in View
+                    errorLiveData.setValue(error);
                 }
 
             }
@@ -89,7 +113,8 @@ public class MainActivityViewModel extends ViewModel {
             public void onFailure(Call<List<RetrofitPOJO>> call, Throwable t) {
                 String error = "Server ERROR " +  t.getLocalizedMessage();
                 Log.e(TAG, "onFailure " + error);
-                MainActivity.ShowError(error);
+                // TODO replace by LiveData
+                //MainActivity.ShowError(error);
                 call.cancel();
             }
         });
