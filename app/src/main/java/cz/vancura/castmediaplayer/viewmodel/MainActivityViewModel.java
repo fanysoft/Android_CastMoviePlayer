@@ -8,12 +8,10 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.vancura.castmediaplayer.helpers.HelperMethods;
 import cz.vancura.castmediaplayer.model.MoviePOJO;
 import cz.vancura.castmediaplayer.model.retrofit.RetrofitAPIClient;
 import cz.vancura.castmediaplayer.model.retrofit.RetrofitAPIInterface;
 import cz.vancura.castmediaplayer.model.retrofit.RetrofitPOJO;
-import cz.vancura.castmediaplayer.view.MainActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,7 +32,7 @@ public class MainActivityViewModel extends ViewModel {
 
     public MutableLiveData<List<MoviePOJO>> getMoviePOJOListLiveData() {
         if (moviePOJOListLiveData == null) {
-            moviePOJOListLiveData = new MutableLiveData<List<MoviePOJO>>();
+            moviePOJOListLiveData = new MutableLiveData<>();
         }
         return moviePOJOListLiveData;
     }
@@ -45,7 +43,7 @@ public class MainActivityViewModel extends ViewModel {
 
     public MutableLiveData<String> getErrorLiveData() {
         if (errorLiveData == null) {
-            errorLiveData = new MutableLiveData<String>();
+            errorLiveData = new MutableLiveData<>();
         }
         return errorLiveData;
     }

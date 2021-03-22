@@ -96,13 +96,10 @@ public class PlayerActivity extends AppCompatActivity {
         playerActivityViewModel = new ViewModelProvider(this).get(PlayerActivityViewModel.class);
 
         // LiveData Observer - for Error
-        final Observer<String> errorObserver = new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable final String error) {
-                // Update the UI
-                Log.d(TAG, "error observer - update GUI now");
-                helperMethods.ShowSnackbar(context, PlayerView, error);
-            }
+        final Observer<String> errorObserver = error -> {
+            // Update the UI
+            Log.d(TAG, "error observer - update GUI now");
+            helperMethods.ShowSnackbar(context, PlayerView, error);
         };
         playerActivityViewModel.getErrorLiveData().observe(this, errorObserver);
 
@@ -159,32 +156,29 @@ public class PlayerActivity extends AppCompatActivity {
         mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
 
         // Cast CastStateListener
-        mCastStateListener = new CastStateListener() {
-            @Override
-            public void onCastStateChanged(int newState) {
+        mCastStateListener = newState -> {
 
-                switch(newState) {
-                    case 1:
-                        Log.d(TAG, "mCastStateListener - onCastStateChanged - state 1 - NO_DEVICES_AVAILABLE - No Cast devices are available");
-                        break;
-                    case 2:
-                        Log.d(TAG, "mCastStateListener - onCastStateChanged - state 2 - NOT_CONNECTED - Cast devices are available, but a Cast session is not established.");
-                        break;
-                    case 3:
-                        Log.d(TAG, "mCastStateListener - onCastStateChanged - state 3 - CONNECTING - A Cast session is being established.");
-                        break;
-                    case 4:
-                        Log.d(TAG, "mCastStateListener - onCastStateChanged - state 4 - CONNECTED - A Cast session is established.");
-                        break;
-                    default:
-                        // empty
-                }
+            switch(newState) {
+                case 1:
+                    Log.d(TAG, "mCastStateListener - onCastStateChanged - state 1 - NO_DEVICES_AVAILABLE - No Cast devices are available");
+                    break;
+                case 2:
+                    Log.d(TAG, "mCastStateListener - onCastStateChanged - state 2 - NOT_CONNECTED - Cast devices are available, but a Cast session is not established.");
+                    break;
+                case 3:
+                    Log.d(TAG, "mCastStateListener - onCastStateChanged - state 3 - CONNECTING - A Cast session is being established.");
+                    break;
+                case 4:
+                    Log.d(TAG, "mCastStateListener - onCastStateChanged - state 4 - CONNECTED - A Cast session is established.");
+                    break;
+                default:
+                    // empty
+            }
 
-                // there was found Cast device
-                if (newState != CastState.NO_DEVICES_AVAILABLE) {
-                    // show cast info - only when app started for 1st time
-                    showIntroductoryOverlay();
-                }
+            // there was found Cast device
+            if (newState != CastState.NO_DEVICES_AVAILABLE) {
+                // show cast info - only when app started for 1st time
+                showIntroductoryOverlay();
             }
         };
 
@@ -269,23 +263,15 @@ public class PlayerActivity extends AppCompatActivity {
 
         if ((mediaRouteMenuItem != null) && mediaRouteMenuItem.isVisible()) {
             // Log.d(TAG, "showIntroductoryOverlay - show cast");
-            new Handler().post(new Runnable() {
-                @Override
-                public void run() {
-                    mIntroductoryOverlay = new IntroductoryOverlay.Builder(
-                            PlayerActivity.this, mediaRouteMenuItem)
-                            .setTitleText("Introducing Cast")
-                            .setSingleTime()
-                            .setOnOverlayDismissedListener(
-                                    new IntroductoryOverlay.OnOverlayDismissedListener() {
-                                        @Override
-                                        public void onOverlayDismissed() {
-                                            mIntroductoryOverlay = null;
-                                        }
-                                    })
-                            .build();
-                    mIntroductoryOverlay.show();
-                }
+            new Handler().post(() -> {
+                mIntroductoryOverlay = new IntroductoryOverlay.Builder(
+                        PlayerActivity.this, mediaRouteMenuItem)
+                        .setTitleText("Introducing Cast")
+                        .setSingleTime()
+                        .setOnOverlayDismissedListener(
+                                () -> mIntroductoryOverlay = null)
+                        .build();
+                mIntroductoryOverlay.show();
             });
         }
     }

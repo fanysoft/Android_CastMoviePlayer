@@ -2,7 +2,10 @@ package cz.vancura.castmediaplayer.helpers;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 
@@ -24,10 +27,23 @@ public class HelperMethods {
     // Is online - check network connection
     public boolean IsOnline(Context context){
 
-        ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        boolean isConnected;
 
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Anndroid 6 and better
+            Network nw = connectivityManager.getActiveNetwork();
+            if (nw == null) isConnected=false;
+
+            NetworkCapabilities actNw = connectivityManager.getNetworkCapabilities(nw);
+            isConnected = actNw != null && (actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH));
+        } else {
+            // getActiveNetworkInfo() is deprecated in API 29 Android 10
+            // https://stackoverflow.com/questions/57277759/getactivenetworkinfo-is-deprecated-in-api-29
+            NetworkInfo nwInfo = connectivityManager.getActiveNetworkInfo();
+            isConnected = nwInfo != null && nwInfo.isConnected();
+        }
 
         Log.d(TAG, "IsOnline returns " + isConnected);
         return isConnected;
@@ -39,7 +55,7 @@ public class HelperMethods {
 
         final Snackbar mySnackbar = Snackbar.make(view, text, Snackbar.LENGTH_INDEFINITE);
         mySnackbar
-                .setActionTextColor(context.getResources().getColor(R.color.accent))
+                .setActionTextColor(ContextCompat.getColor(context, R.color.accent))
                 .setAction("Dismiss", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

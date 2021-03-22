@@ -53,15 +53,16 @@ dependencies {
 
     // MVVM
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation "androidx.lifecycle:lifecycle-viewmodel:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:2.3.0"
     // LiveData
-    implementation "androidx.lifecycle:lifecycle-livedata:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-livedata:2.3.0"
     // Lifecycles only (without ViewModel or LiveData)
-    implementation "androidx.lifecycle:lifecycle-runtime:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-runtime:2.3.0"
     // Saved state module for ViewModel
-    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.0"
     // Annotation processor
-    annotationProcessor "androidx.lifecycle:lifecycle-compiler:2.2.0"
+    //annotationProcessor "androidx.lifecycle:lifecycle-compiler:2.3.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.3.0"
 
     // exo player
     implementation 'com.google.android.exoplayer:exoplayer:2.11.4'
@@ -71,7 +72,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-cast-framework:19.0.0'
     implementation 'com.googlecode.android-query:android-query:0.25.9'
 
-    testImplementation 'junit:junit:4.+'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }

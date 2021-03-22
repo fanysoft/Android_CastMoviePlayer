@@ -77,26 +77,20 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
         // LiveData Observer - for Error
-        final Observer<String> errorObserver = new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable final String error) {
-                // Update the UI
-                Log.d(TAG, "error observer - update GUI now");
-                ShowError(error);
-            }
+        final Observer<String> errorObserver = error -> {
+            // Update the UI
+            Log.d(TAG, "error observer - update GUI now");
+            ShowError(error);
         };
         mainActivityViewModel.getErrorLiveData().observe(this, errorObserver);
 
 
         // LiveData Observer - for List of MoviePOJO
-        final Observer<List<MoviePOJO>> dataObserver = new Observer<List<MoviePOJO>>() {
-            @Override
-            public void onChanged(List<MoviePOJO> list) {
-                // Update the UI
-                Log.d(TAG, "data observer - update GUI now");
-                ShowRecyclerView();
+        final Observer<List<MoviePOJO>> dataObserver = list -> {
+            // Update the UI
+            Log.d(TAG, "data observer - update GUI now");
+            ShowRecyclerView();
 
-            }
         };
         mainActivityViewModel.getMoviePOJOListLiveData().observe(this, dataObserver);
 
@@ -107,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         progressBar = findViewById(R.id.progressBar);
 
         // ToolBar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // helper class
@@ -134,91 +128,83 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         }
 
         // Images - onClick - user selection : sort RecyclerView
-        imageRecyclerViewSort.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "clicked - RecylerView Sort icon");
+        imageRecyclerViewSort.setOnClickListener(view -> {
+            Log.d(TAG, "clicked - RecylerView Sort icon");
 
-                // sort by - hardcoded - make user selection in dialog - to do idea
-                String SortBy = "id";
+            // sort by - hardcoded - make user selection in dialog - to do idea
+            String SortBy = "id";
 
-                switch(SortBy) {
-                    case "name":
-                        Log.d(TAG, "sort by name");
-                        // sort by - implement by Name - to do idea
+            switch(SortBy) {
+                case "name":
+                    Log.d(TAG, "sort by name");
+                    // sort by - implement by Name - to do idea
 
-                        // code block
-                        break;
-                    case "views":
-                        Log.d(TAG, "sort by views");
-                        // sort by - implement by views - to do idea
+                    // code block
+                    break;
+                case "views":
+                    Log.d(TAG, "sort by views");
+                    // sort by - implement by views - to do idea
 
-                        // code block
-                        break;
+                    // code block
+                    break;
 
-                    case "id":
-                        Log.d(TAG, "sort by id - SortByIdLowToHigh=" + SortByIdLowToHigh);
+                case "id":
+                    Log.d(TAG, "sort by id - SortByIdLowToHigh=" + SortByIdLowToHigh);
 
-                        // reverse
-                        SortByIdLowToHigh = ! SortByIdLowToHigh;
+                    // reverse
+                    SortByIdLowToHigh = ! SortByIdLowToHigh;
 
-                        // Sort in order of movie id - FUNGUJE
-                        Collections.sort(MainActivityViewModel.moviePOJOList, new Comparator<MoviePOJO>() {
-                            public int compare(MoviePOJO moviePOJO1, MoviePOJO moviePOJO2) {
-                                if(moviePOJO1.getMovieId() > moviePOJO2.getMovieId()) {
-                                    if (SortByIdLowToHigh){
-                                        return 1;
-                                    }else{
-                                        return -1;
-                                    }
-                                }else if(moviePOJO1.getMovieId() < moviePOJO2.getMovieId()) {
-                                    if(SortByIdLowToHigh){
-                                        return -1;
-                                    }else{
-                                        return 1;
-                                    }
-                                }
-                                return 0;
+                    // Sort in order of movie id - FUNGUJE
+                    Collections.sort(MainActivityViewModel.moviePOJOList, (moviePOJO1, moviePOJO2) -> {
+                        if (moviePOJO1.getMovieId() > moviePOJO2.getMovieId()) {
+                            if (SortByIdLowToHigh) {
+                                return 1;
+                            } else {
+                                return -1;
                             }
-                        });
+                        } else if (moviePOJO1.getMovieId() < moviePOJO2.getMovieId()) {
+                            if (SortByIdLowToHigh) {
+                                return -1;
+                            } else {
+                                return 1;
+                            }
+                        }
+                        return 0;
+                    });
 
-                        // code block
-                        break;
+                    // code block
+                    break;
 
 
-                    default:
-                        // code block
-                }
-
-
-                ShowRecyclerView();
-
+                default:
+                    // code block
             }
+
+
+            ShowRecyclerView();
+
         });
 
 
         // Images - onClick - user selection : show RecyclerView with columns or not
-        imageRecyclerViewStyle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "clicked - RecylerView Style icon - RecyclerViewCollumns=" + RecyclerViewCollumns);
+        imageRecyclerViewStyle.setOnClickListener(view -> {
+            Log.d(TAG, "clicked - RecylerView Style icon - RecyclerViewCollumns=" + RecyclerViewCollumns);
 
-                // set oposite value
-                RecyclerViewCollumns = !RecyclerViewCollumns;
+            // set oposite value
+            RecyclerViewCollumns = !RecyclerViewCollumns;
 
-                if (RecyclerViewCollumns) {
-                    // show columens
-                    SetupRecyclerView(true);
-                    // image change
-                    imageRecyclerViewStyle.setImageResource(R.drawable.ic_view_list_24px_black);
-                }else{
-                    // hide columns
-                    SetupRecyclerView(false);
-                    // image change
-                    imageRecyclerViewStyle.setImageResource(R.drawable.ic_view_stream_24px_black);
-                }
-
+            if (RecyclerViewCollumns) {
+                // show columens
+                SetupRecyclerView(true);
+                // image change
+                imageRecyclerViewStyle.setImageResource(R.drawable.ic_view_list_24px_black);
+            }else{
+                // hide columns
+                SetupRecyclerView(false);
+                // image change
+                imageRecyclerViewStyle.setImageResource(R.drawable.ic_view_stream_24px_black);
             }
+
         });
 
 
@@ -310,14 +296,13 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.action_refresh:
-                Log.d(TAG, "Refresh from menu");
-                mainActivityViewModel.HttpGetData();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        // Lint: should use if instead of switch
+        if (item.getItemId() == R.id.action_refresh) {
+            Log.d(TAG, "Refresh from menu");
+            mainActivityViewModel.HttpGetData();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
 
 
     }

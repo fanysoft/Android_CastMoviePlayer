@@ -20,10 +20,9 @@ public class CastOptionsProvider implements OptionsProvider {
 
     @Override
     public CastOptions getCastOptions(Context context) {
-        CastOptions castOptions = new CastOptions.Builder()
+        return new CastOptions.Builder()
                 .setReceiverApplicationId(context.getString(R.string.cast_app_id))
                 .build();
-        return castOptions;
     }
     @Override
 

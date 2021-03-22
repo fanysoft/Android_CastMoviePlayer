@@ -7,4 +7,16 @@
 
     <string name="media_route_menu_title">Play on&#8230;</string>
 
+    <string name="cast_info">Cast info</string>
+    <string name="movie_name">movie name</string>
+    <string name="movie_descr">movie descr</string>
+    <string name="movie_licence">movie licence</string>
+    <string name="movie_views">movie views</string>
+
+    <string name="contentDescr_image">image</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="name">Name</string>
+    <string name="id">id</string>
+    <string name="views">views</string>
+
 </resources>
